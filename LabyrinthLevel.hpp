@@ -7,7 +7,6 @@
 namespace Labyrinth {
 
 typedef size_t coord;
-typedef char code_type;
 
 struct Position {
   coord row;
@@ -15,19 +14,31 @@ struct Position {
   Position(coord row,coord col) : row(row), col(col) {}
 };
 
+enum class CellType : char {
+  empty=' ',
+    wall='#',
+    water,
+    grass,
+    door,
+    stairs_up,
+    stairs_down,
+    hole
+};
+
+char cell_type_to_char(CellType cell_type);
 
 class Cell {
 public:
   //constructors
-  Cell(Position position,code_type code) : position(position), code(code) {}
-  Cell() : position(0,0), code(' ') {}
+  Cell(Position position,CellType cell_type) : position(position), cell_type(cell_type) {}
+  Cell() : position(0,0), cell_type(CellType::empty) {}
   //getters
   Position getPosition() const {return position;}
-  char getChar() const {return (char) code;}
+  CellType getCellType() const {return cell_type;}
 protected:
 private:
   Position position;
-  code_type code;
+  CellType cell_type;
 };
 
 
@@ -55,7 +66,7 @@ std::ostream& operator<<(std::ostream& os,const Level& level);
 std::ostream& operator<<(std::ostream& os,const Cell& cell);
 
 //other helpers
-code_type random_wall(int seed);
+CellType random_wall(int seed);
 
 
 
