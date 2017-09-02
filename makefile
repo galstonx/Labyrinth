@@ -1,11 +1,14 @@
-CC=g++
-CFLAGS=-std=c++11 -Wall
-DEPS=LabyrinthLevel.hpp
-OBJ=LabyrinthLevel.o test_lab_level.o
+CC=g++-7
+CFLAGS=-std=c++11 -Wall -Iinclude/
+DEPS=include/LabyrinthLevel.hpp
+OBJ=build/LabyrinthLevel.o build/test_lab_level.o
 
-%.o : %.cpp $(DEPS)
+build/%.o : src/%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-test_lab_level: $(OBJ)
+build/%.o : test/%.cpp $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+bin/test_lab_level: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
