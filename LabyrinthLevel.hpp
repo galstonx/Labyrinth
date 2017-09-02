@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "Event.hpp"
 
 namespace Labyrinth {
 
@@ -58,6 +59,7 @@ private:
   coord rows;
   coord cols;
   std::vector<std::vector<Cell>> cells;
+  std::vector<GameEventHandler*> event_handlers;
 };
 
 
