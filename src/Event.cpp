@@ -31,6 +31,11 @@ void GameEventServer::remove_handler(GameEventHandler& handler) {
   (pimpl->event_handlers).erase(&handler);
 }
 
+void GameEventServer::send_event_to_handlers(const GameEvent& event) {
+  for(auto iter : pimpl->event_handlers) {
+    (*iter)(event);
+  }
+}
 
 /*
 
@@ -40,7 +45,7 @@ GameEventHandler
 
 
 struct GameEventHandler::GEHImpl {
-
+  GEHImpl() {}
   std::set<GameEventServer*> event_servers;
 };
 
@@ -53,22 +58,6 @@ GameEventHandler::~GameEventHandler() {
   }
 }
 
-
-
-GameEventHandler::GameEventHandler(GameEventHandler&& other) noexcept=default;
-
-GameEventHandler& GameEventHandler::operator=(GameEventHandler&& other) noexcept=default;
-
-GameEventHandler::GameEventHandler(const GameEventHandler& other) : pimpl(nullptr) {
-  if(other.pimpl) pimpl=std::make_unique<GEHImpl>(*other.pimpl);
-}
-
-GameEventHandler& GameEventHandler::operator=(const GameEventHandler& other) {
-  if(! other.pimpl) pimpl.reset();
-  else if (! pimpl) pimpl = std::make_unique<GEHImpl>(*other.pimpl);
-  else *pimpl=*other.pimpl;
-  return *this;
-}
 
 void GameEventHandler::register_with_server(GameEventServer& server) {
   add_server(server);
