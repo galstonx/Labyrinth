@@ -3,14 +3,11 @@
 
 #include <memory>
 #include <string>
-
+#include "EventFwd.hpp"
 
 
 namespace Labyrinth {
 
-class GameEventHandler;
-class GameEventServer;
-class GameEvent;
 
 enum class GameEventType : char {
   test
@@ -19,20 +16,23 @@ enum class GameEventType : char {
 /*
 
   GameEvent class
-  to be used polymorphically
+  to potentially be used polymorphically
+  if more detailed events are needed
+  exception safe (derived class constructor may only be exception neutral)
 
 */
 
 class GameEvent {
 public:
-  GameEvent(GameEventType type=GameEventType::test) : type(type) {}
+  GameEvent(GameEventType type) : type(type) {}
   virtual ~GameEvent()=default;
-  GameEventType getType() const {
+  GameEventType getType() const noexcept {
     return type;
   }
 private:
   GameEventType type;
 };
+
 
 /*
   GameEventHandler
@@ -40,17 +40,25 @@ private:
   uses pimpl idiom
   derived class needs to instantiate operator()
   make sure copy/move's work okay for derived class
-  
+
+  class invariants:
+  pimpl is non-null
+
 */
 class GameEventHandler {
   friend GameEventServer;
 public:
+  // exception neutral
   GameEventHandler();
+  // never throws
   virtual ~GameEventHandler();
-  GameEventHandler(GameEventHandler&& other) noexcept;
-  GameEventHandler& operator=(GameEventHandler&& other) noexcept;
-  GameEventHandler(const GameEventHandler& other);
-  GameEventHandler& operator=(const GameEventHandler& other);
+  // delete copy, move and assignment
+  // as these may lead to confusing behavior for client
+  // e.g. should the copy also be registered?
+  GameEventHandler(GameEventHandler&& other)=delete;
+  GameEventHandler& operator=(GameEventHandler&& other)=delete;
+  GameEventHandler(const GameEventHandler& other)=delete;
+  GameEventHandler& operator=(const GameEventHandler& other)=delete;
   
   virtual void operator()(const GameEvent& event)=0;
   
